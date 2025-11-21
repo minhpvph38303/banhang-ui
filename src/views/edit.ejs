@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quản lý</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css"
+    />
+    <link />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <style>
+      .container-box {
+        padding: 20px;
+        margin: 100px 200px 0px 200px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+
+  <body class="p-4">
+    <div class="container-box">
+      <h2 style="text-align: center">Quản lý</h2>
+      <a
+        style="
+          background-color: darkblue;
+          text-decoration: none;
+          color: aliceblue;
+          padding: 10px;
+          margin: 5px;
+        "
+        href="/add"
+        class="btn btn-primary mb-3"
+        >Thêm khách hàng
+      </a>
+      <hr />
+      <table id="table" class="display">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên</th>
+            <th>SDT</th>
+            <th>Địa chỉ</th>
+            <th>Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% customers.forEach((c,i)=>{ %>
+          <tr>
+            <td><%= i+1 %></td>
+            <td><%= c.name %></td>
+            <td><%= c.sdt %></td>
+            <td><%= c.diachi %></td>
+            <td>
+              <button
+                style="background-color: brown"
+                type="submit"
+                class="btn btn-primary"
+              >
+                <a
+                  style="text-decoration: none; color: white"
+                  href="/edit/<%= c.id %>"
+                  >Sửa</a
+                >
+              </button>
+              <button
+                style="background-color: blue"
+                type="submit"
+                class="btn btn-sm btn-danger"
+              >
+                <a
+                  style="color: white; text-decoration: none"
+                  href="/delete/<%= c.id %>"
+                  >Xoá</a
+                >
+              </button>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#table").DataTable({});
+      });
+    </script>
+  </body>
+</html>
