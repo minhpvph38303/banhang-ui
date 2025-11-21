@@ -1,91 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Quản lý</title>
+    <title>Sửa</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css"
     />
-    <link />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-    <style>
-      .container-box {
-        padding: 20px;
-        margin: 100px 200px 0px 200px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </head>
 
   <body class="p-4">
-    <div class="container-box">
-      <h2 style="text-align: center">Quản lý</h2>
-      <a
-        style="
-          background-color: darkblue;
-          text-decoration: none;
-          color: aliceblue;
-          padding: 10px;
-          margin: 5px;
-        "
-        href="/add"
-        class="btn btn-primary mb-3"
-        >Thêm khách hàng
-      </a>
-      <hr />
-      <table id="table" class="display">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Tên</th>
-            <th>SDT</th>
-            <th>Địa chỉ</th>
-            <th>Thao Tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% customers.forEach((c,i)=>{ %>
-          <tr>
-            <td><%= i+1 %></td>
-            <td><%= c.name %></td>
-            <td><%= c.sdt %></td>
-            <td><%= c.diachi %></td>
-            <td>
-              <button
-                style="background-color: brown"
-                type="submit"
-                class="btn btn-primary"
-              >
-                <a
-                  style="text-decoration: none; color: white"
-                  href="/edit/<%= c.id %>"
-                  >Sửa</a
-                >
-              </button>
-              <button
-                style="background-color: blue"
-                type="submit"
-                class="btn btn-sm btn-danger"
-              >
-                <a
-                  style="color: white; text-decoration: none"
-                  href="/delete/<%= c.id %>"
-                  >Xoá</a
-                >
-              </button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+    <div class="container mt-3">
+      <h2 style="text-align: center">Sửa khách hàng</h2>
 
-    <script>
-      $(document).ready(function () {
-        $("#table").DataTable({});
-      });
-    </script>
+      <form action="/edit/<%= cat.id %>" method="POST">
+        <div class="mb-3 mt-3">
+          <label>Tên </label>
+          <input
+            type="text"
+            name="name"
+            class="form-control"
+            value="<%= cat.name %>"
+            required
+          />
+        </div>
+        <div class="mb-3 mt-3">
+          <label>SDT </label>
+          <input
+            type="text"
+            name="sdt"
+            class="form-control"
+            value="<%= cat.sdt %>"
+            required
+          />
+        </div>
+        <div class="mb-3 mt-3">
+          <label for="">Địa chỉ</label>
+          <input
+            type="text"
+            name="diachi"
+            class="form-control"
+            value="<%= cat.diachi %>"
+            required
+          />
+        </div>
+        <button class="btn btn-primary mt-3">Submit</button>
+      </form>
+    </div>
   </body>
 </html>
