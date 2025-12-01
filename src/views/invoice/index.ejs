@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Danh sách Hóa đơn</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+    />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 20px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        text-align: center;
+        color: #2563eb;
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f0f0f0;
+      }
+
+      tr:hover {
+        background-color: #f9f9f9;
+      }
+
+      a.btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 8px 12px;
+        background-color: #2563eb;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+      }
+
+      a.btn:hover {
+        background-color: #1d4ed8;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Danh sách Hóa đơn của Customer <%= customerId %></h2>
+
+      <a href="/customers/<%= customerId %>/invoices/add" class="btn"
+        >Thêm hóa đơn mới</a
+      >
+      <a class="btn" href="/">quay lại</a>
+      <!-- 
+        <input style="float: right" type="text" placeholder="tìm kiếm" /> -->
+
+      <table class="display" id="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Mã hóa đơn (ID)</th>
+            <th>Số tiền</th>
+            <th>Ngày tạo</th>
+            <!-- <th>Hành động</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <% if (invoices.length === 0) { %>
+          <tr>
+            <td colspan="5" style="text-align: center">Chưa có hóa đơn nào</td>
+          </tr>
+          <% } else { %> <% invoices.forEach((invoice, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= invoice.invoiceId %></td>
+            <td>
+              <%= invoice.price.toLocaleString('vi-VN', { style: 'currency',
+              currency: 'VND' }) %>
+            </td>
+            <td>
+              <%= invoice.createdAt ? new
+              Date(invoice.createdAt).toLocaleString('vi-VN') : 'Chưa có' %>
+            </td>
+            <!-- <td>
+              <a href="/invoices/<%= invoice.invoiceId %>"
+                ><button>Xem</button></a
+              >
+            </td> -->
+          </tr>
+          <% }) %> <% } %>
+        </tbody>
+      </table>
+    </div>
+    <!-- <script>
+      $(document).ready(function () {
+        // Khởi tạo DataTable
+        const table = $("#table").DataTable({
+          pageLength: 5, // số hàng trên mỗi trang
+          lengthChange: false, // ẩn dropdown chọn số hàng
+          ordering: true, // bật sắp xếp theo cột
+          info: true, // hiện info tổng số hàng
+          searching: true, // bật search mặc định (chúng ta sẽ custom)
+        });
+
+        // Custom search theo ô input riêng
+        $("#searchInput").on("keyup", function () {
+          table.search(this.value).draw();
+        });
+      });
+    </script> -->
+  </body>
+</html>

@@ -4,37 +4,90 @@
     <title>Quản lý</title>
     <link
       rel="stylesheet"
-      href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
     />
-    <link />
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <style>
-      .container-box {
-        padding: 20px;
-        margin: 100px 200px 0px 200px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
       }
+
+      .container-box {
+        max-width: 800px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 20px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      h2 {
+        text-align: center;
+        color: #2563eb;
+        margin-bottom: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f0f0f0;
+      }
+
+      a.btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 8px 12px;
+        background-color: #2563eb;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+      }
+
+      a.btn:hover {
+        background-color: #1d4ed8;
+      }
+      /* input {
+        margin-bottom: 10px;
+        padding: 5px;
+        width: 180px;
+      } */
+      /* 
+      .bt {
+        float: right;
+      } */
     </style>
   </head>
 
   <body class="p-4">
     <div class="container-box">
       <h2 style="text-align: center">Quản lý</h2>
-      <a
-        style="
-          background-color: darkgreen;
-          text-decoration: none;
-          color: aliceblue;
-          padding: 10px;
-          margin: 5px;
-        "
-        href="/add"
-        class="btn btn-primary mb-3"
-        >Thêm khách hàng
-      </a>
+      <% if (role === "admin") { %>
+      <a class="btn" id="add" href="/add">Thêm khách hàng</a>
+      <% } %>
+      <a class="btn" style="float: right; margin-left: 10px" href="/register"
+        >Đăng ký</a
+      >
+      <a class="btn" style="float: right" href="/login">Đăng nhập</a>
       <hr />
+      <!-- <div class="bt">
+        <input type="text" id="searchInput" placeholder="tìm kiếm..." />
+      </div> -->
       <table id="table" class="display">
         <thead>
           <tr>
@@ -53,45 +106,80 @@
             <td><%= c.sdt %></td>
             <td><%= c.diachi %></td>
             <td>
-              <button
-                style="
-                  background-color: brown;
-                  padding: 10px;
-                  border-radius: 5px;
-                "
-                type="submit"
-              >
-                <a
-                  style="text-decoration: none; color: white"
-                  href="/edit/<%= c.id %>"
-                  >Sửa</a
+              <% if (role === "admin") { %>
+              <a href="/edit/<%= c.id %>"
+                ><button
+                  style="
+                    background-color: brown;
+                    padding: 10px;
+                    border-radius: 5px;
+                    color: aliceblue;
+                  "
+                  type="submit"
                 >
-              </button>
-              <button
-                style="
-                  background-color: blue;
-                  padding: 10px;
-                  border-radius: 5px;
-                "
-                type="submit"
-                class="btn btn-sm btn-danger"
-              >
-                <a
-                  style="color: white; text-decoration: none"
-                  href="/delete/<%= c.id %>"
-                  >Xoá</a
+                  Sửa
+                </button>
+              </a>
+              <a href="/delete/<%= c.id %>"
+                ><button
+                  onclick="return confirm('Bạn có đồng ý xoá hay không?')"
+                  style="
+                    background-color: blue;
+                    padding: 10px;
+                    border-radius: 5px;
+                    color: aliceblue;
+                  "
+                  type="submit"
                 >
-              </button>
+                  Xóa
+                </button></a
+              >
+              <a href="/customers/<%= c.id %>/invoices/add">
+                <button
+                  style="
+                    background-color: rgb(68, 190, 127);
+                    padding: 10px;
+                    border-radius: 5px;
+                    color: aliceblue;
+                  "
+                  type="submit"
+                >
+                  Tạo
+                </button>
+              </a>
+              <a href="/customers/<%= c.id %>/invoices">
+                <button
+                  style="
+                    background-color: rgb(64, 80, 170);
+                    padding: 10px;
+                    border-radius: 5px;
+                    color: aliceblue;
+                  "
+                  type="submit"
+                >
+                  Xem
+                </button>
+              </a>
+              <% } else { %> Không có quyền <% } %>
             </td>
           </tr>
           <% }) %>
         </tbody>
       </table>
     </div>
-
     <script>
       $(document).ready(function () {
-        $("#table").DataTable({});
+        const table = $("#table").DataTable({
+          pageLength: 5,
+          lengthChange: false,
+          ordering: true, // bật sắp xếp theo cột
+          info: true, // hiện info tổng số hàng
+          searching: true,
+        });
+
+        $("#searchInput").on("keyup", function () {
+          table.search(this.value).draw();
+        });
       });
     </script>
   </body>

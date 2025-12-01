@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap CSS & JS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .container {
+        margin: 50px 0px 0px 530px;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: rgb(209, 197, 221);
+        width: 400px;
+        height: 450px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2 style="text-align: center">Login</h2>
+      <form onsubmit="event.preventDefault(); login();">
+        <div class="mb-3 mt-3">
+          <label for="loginUser">Email:</label>
+          <input
+            type="email"
+            class="form-control"
+            id="loginUser"
+            placeholder="Enter email"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="loginPass">Password:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="loginPass"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+        <div class="form-check mb-3">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" name="remember" />
+            Remember me
+          </label>
+        </div>
+
+        <button style="width: 300px" type="submit" class="btn btn-primary">
+          Login
+        </button>
+        <div class="mt-3">
+          <a href="">quê mật khẩu?</a>
+        </div>
+
+        <div style="text-align: center" class="mt-3">
+          Bạn chưa có tài khoản?
+          <a href="/register">Đăng ký ngay</a>
+        </div>
+
+        <p id="result" class="mt-3 text-center text-danger"></p>
+      </form>
+    </div>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const email = sessionStorage.getItem("regEmail");
+        if (email) {
+          document.getElementById("loginUser").value = email;
+          sessionStorage.removeItem("regEmail");
+        }
+      });
+      async function login() {
+        const username = document.getElementById("loginUser").value;
+        const password = document.getElementById("loginPass").value;
+
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username,
+              password,
+            }),
+            credentials: "include",
+          });
+
+          const data = await res.json();
+          document.getElementById("result").innerText = data.message;
+
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.role);
+            window.location.href = "/";
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("result").innerText =
+            "Có lỗi xảy ra, thử lại sau!";
+        }
+      }
+    </script>
+  </body>
+</html>

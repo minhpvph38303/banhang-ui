@@ -7,6 +7,22 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .container {
+        max-width: 500px;
+        margin-top: 50px;
+        padding: 30px;
+        border-radius: 15px;
+        background-color: #f8f9fa;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        text-align: center;
+        color: #2563eb;
+        margin-bottom: 20px;
+      }
+    </style>
   </head>
 
   <body class="p-4">
@@ -31,6 +47,7 @@
             name="sdt"
             class="form-control"
             value="<%= cat.sdt %>"
+            maxlength="10"
             required
           />
         </div>

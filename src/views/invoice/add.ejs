@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Thêm hóa đơn</title>
+    <style>
+      body {
+        font-family: Arial;
+      }
+
+      .box {
+        width: 400px;
+        margin: 50px 0px 0px 530px;
+        border: 1px solid #ddd;
+        padding: 40px;
+        border-radius: 20px;
+      }
+
+      input {
+        width: 95%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      h2 {
+        text-align: center;
+        color: #2563eb;
+        margin-bottom: 20px;
+      }
+
+      button {
+        width: 100%;
+        background: #2563eb;
+        color: #fff;
+        padding: 8px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .msg {
+        font-size: 14px;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="box">
+      <h2>Thêm hóa đơn cho customer <%= customerId %></h2>
+      <div class="mb-3">
+        <label class="form-label">Số tiền</label>
+        <input
+          type="number"
+          id="price"
+          class="form-control"
+          placeholder="số tiền"
+          min="0"
+          step="0.01"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Ngày tạo</label>
+        <input
+          type="datetime-local"
+          id="createdAt"
+          class="form-control"
+          required
+        />
+      </div>
+      <button onclick="addInvoice()">Tạo hóa đơn</button>
+
+      <p id="message" class="msg"></p>
+    </div>
+
+    <script>
+      async function addInvoice() {
+        // const invoiceId = document.getElementById("invoiceId").value;
+        const price = +document.getElementById("price").value;
+        const createdAt = document.getElementById("createdAt").value;
+        const messageBox = document.getElementById("message");
+        messageBox.textContent = "";
+        // if (!invoiceId) {
+        //   messageBox.textContent = "Vui lòng nhập Mã hóa đơn!";
+        //   return;
+        // }
+        if (!price) {
+          messageBox.textContent = "Vui lòng nhập Số tiền!";
+          return;
+        }
+        if (price < 0) {
+          messageBox.textContent = "Số tiền không được âm!";
+          return;
+        }
+        if (!createdAt) {
+          messageBox.textContent = "Vui lòng nhập Ngày tạo!";
+          return;
+        }
+
+        try {
+          const res = await fetch(`/customers/<%= customerId %>/invoices`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              // invoiceId,
+              price,
+              createdAt,
+            }),
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message);
+          messageBox.textContent = "✅ " + data.message;
+          setTimeout(() => {
+            window.location.href = `/customers/<%= customerId %>/invoices`;
+          }, 1000);
+        } catch (err) {
+          messageBox.textContent = "❌ " + err.message;
+        }
+      }
+    </script>
+  </body>
+</html>

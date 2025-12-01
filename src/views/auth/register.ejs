@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Register</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .container {
+        /* display: flex; */
+        margin: 50px 0px 0px 530px;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        background-color: rgb(209, 197, 221);
+        width: 400px;
+        height: 570px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2 style="text-align: center">Register</h2>
+      <form onsubmit="event.preventDefault(); register();">
+        <div class="mt-3 mb-3">
+          <label for="name">Họ Tên:</label>
+          <input
+            type="name"
+            class="form-control"
+            name="name"
+            id="name"
+            placeholder="Enter name"
+            required
+          />
+        </div>
+        <div class="mt-3 mb-3">
+          <label for="email">Email:</label>
+          <input
+            type="email"
+            class="form-control"
+            name="email"
+            id="email"
+            placeholder="Enter email"
+            required
+          />
+        </div>
+        <div class="mb-3">
+          <label for="sdt">SDT:</label>
+          <input
+            type="number"
+            class="form-control"
+            name="sdt"
+            id="sdt"
+            placeholder="Enter SDT"
+            maxlength="10"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="password">Password:</label>
+          <input
+            type="password"
+            class="form-control"
+            name="password"
+            id="password"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+        <button
+          style="width: 300px; margin: 20px 20px 0 0"
+          type="submit"
+          class="btn btn-primary"
+        >
+          Đăng ký
+        </button>
+        <div style="text-align: center; padding-top: 20px" class="mb-3">
+          bạn đã có tài khoản?
+          <a href="/login">Đăng nhập ngay</a>
+        </div>
+        <p id="result" class="mt-3 text-center text-danger"></p>
+      </form>
+    </div>
+
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        sessionStorage.removeItem("regEmail");
+        sessionStorage.removeItem("regData");
+      });
+      async function register() {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const sdt = document.getElementById("sdt").value;
+        const password = document.getElementById("password").value;
+
+        if (!/^0\d{9}$/.test(sdt)) {
+          document.getElementById("result").innerText =
+            "Số điện thoại phải có 10 chữ số và bắt đầu bằng số 0";
+          return;
+        }
+
+        try {
+          const res = await fetch("/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              sdt,
+              password,
+              role: "views",
+            }),
+          });
+
+          const data = await res.json();
+          document.getElementById("result").innerText = data.message;
+
+          if (data.status === "success") {
+            setTimeout(() => {
+              window.location.href = "/login";
+            }, 1000);
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("result").innerText =
+            "Lỗi không thể kết nối server";
+        }
+      }
+    </script>
+  </body>
+</html>
