@@ -50,7 +50,6 @@
             class="form-control"
             placeholder="Nhập số điện thoại"
             required
-            maxlength="10"
           />
         </div>
 
@@ -66,30 +65,34 @@
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Submit</button>
+        <p id="result" class="mt-3 text-center text-danger"></p>
       </form>
     </div>
 
     <script>
       const token = localStorage.getItem("token");
-      // const role = localStorage.getItem("role");
-
-      // if (!token || role !== "admin") {
-      //   alert("Bạn không có quyền truy cập trang này!");
-      //   window.location.href = "/";
-      // }
 
       const form = document.querySelector("form");
+
+      const resultText = document.getElementById("result");
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = form.name.value;
         const sdt = form.sdt.value;
         const diachi = form.diachi.value;
 
+        if (!/^0\d{9}$/.test(sdt)) {
+          resultText.innerText =
+            "Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số!";
+          return;
+        }
+
+        resultText.innerText = ""; // Xóa lỗi nếu hợp lệ
+
         const res = await fetch("/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // Authorization: `Bearer ${token}`,
           },
           credentials: "include",
           body: JSON.stringify({
