@@ -108,61 +108,62 @@ app.get("/register", (req, res) => {
     res.render("auth/register");
 });
 
-app.post("/register", (req, res) => {
-    const { name, email, sdt, password } = req.body;
-    if (!/^0\d{9}$/.test(sdt)) {
-        return res
-            .status(400)
-            .json({ status: "fail", message: "SĐT phải bắt đầu bằng 0 và có 10 số" });
+app.post("/register", async(req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ status: "fail", message: "Thiếu thông tin" });
+        }
+
+        // Kiểm tra email đã tồn tại chưa
+        const [rows] = await db.promise().query("SELECT * FROM users WHERE email = ?", [email]);
+        if (rows.length > 0) {
+            return res.status(400).json({ status: "fail", message: "Email đã tồn tại" });
+        }
+
+        // Hash password
+        const hashed = await bcrypt.hash(password, 10);
+
+        await db.promise().query(
+            "INSERT INTO users (name, email, password, role) VALUES (?,?,?,?)", [name, email, hashed, "viewer"]
+        );
+
+        res.json({ status: "success", message: "Đăng ký thành công" });
+
+    } catch (err) {
+        console.error("REGISTER ERROR:", err);
+        res.status(500).json({ status: "fail", message: "Lỗi server" });
     }
-
-    db.query("SELECT * FROM users WHERE email = ?", [email], (err, result) => {
-        if (err)
-            return res.status(500).json({ status: "fail", message: "Lỗi server" });
-        if (result.length > 0)
-            return res.json({ status: "fail", message: "Tài khoản đã tồn tại" });
-
-        bcrypt.hash(password, 10, (err, hash) => {
-            if (err)
-                return res.status(500).json({ status: "fail", message: "Lỗi mã hoá" });
-            db.query(
-                "INSERT INTO users (name, email, sdt, password, role) VALUES (?,?,?,?,?)", [name, email, sdt, hash, "viewer"],
-                (err) => {
-                    if (err)
-                        return res
-                            .status(500)
-                            .json({ status: "fail", message: "Không thể tạo tài khoản" });
-                    res.json({ status: "success", message: "Đăng ký thành công!" });
-                }
-            );
-        });
-    });
 });
 
+// ===== LOGIN =====
 app.get("/login", (req, res) => {
     res.render("auth/login");
 });
 
 app.post("/login", async(req, res) => {
     try {
-        const { username, password } = req.body;
-        console.log("Login attempt:", username); // <--- log
+        const { email, password } = req.body;
 
-        const [rows] = await db.promise().query(
-            "SELECT * FROM users WHERE email = ?", [username]
-        );
+        if (!email || !password) {
+            return res.status(400).json({ status: "fail", message: "Thiếu email hoặc mật khẩu" });
+        }
 
-        console.log("DB result:", rows); // <--- log
-
-        if (rows.length === 0) {
-            return res.json({ status: "fail", message: "Sai tài khoản" });
+        const [rows] = await db.promise().query("SELECT * FROM users WHERE email = ?", [email]);
+        if (!rows || rows.length === 0) {
+            return res.status(401).json({ status: "fail", message: "Sai tài khoản" });
         }
 
         const user = rows[0];
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.json({ status: "fail", message: "Sai mật khẩu" });
+        if (!user.password || !user.password.startsWith("$2")) {
+            return res.status(400).json({ status: "fail", message: "Password trong DB không hợp lệ" });
+        }
 
-        if (!process.env.SECRET_KEY) throw new Error("SECRET_KEY missing");
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(401).json({ status: "fail", message: "Sai mật khẩu" });
+        }
 
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role },
             process.env.SECRET_KEY, { expiresIn: "1h" }
@@ -173,10 +174,12 @@ app.post("/login", async(req, res) => {
         res.json({ status: "success", message: "Đăng nhập thành công", role: user.role, token });
 
     } catch (err) {
-        console.error("Login error:", err); // <--- log chi tiết
+        console.error("LOGIN ERROR:", err);
         res.status(500).json({ status: "fail", message: "Lỗi server" });
     }
 });
+
+
 
 
 // Customers invoices

@@ -1,20 +1,20 @@
-# Dùng Node LTS (ổn định)
-FROM node:18-alpine
+# 1. Chọn image Node chính thức
+FROM node:22
 
-# Tạo thư mục trong container
+# 2. Set thư mục làm việc trong container
 WORKDIR /app
 
-# Copy file package để cài dependency
+# 3. Copy package.json và package-lock.json trước
 COPY package*.json ./
 
-# Cài dependencies (production)
+# 4. Cài đặt dependencies
 RUN npm install
 
-# Copy toàn bộ source code vào container
+# 5. Copy toàn bộ source code vào container
 COPY . .
 
-# Expose port API (ví dụ 3000)
-EXPOSE 8080
+# 6. Expose port (Node chạy port 3000)
+EXPOSE 3000
 
-# Lệnh chạy API (điều chỉnh theo file thật của bạn)
-CMD ["node", "src/server.js"]
+# 7. Lệnh chạy khi container start
+CMD ["node", "server.js"]

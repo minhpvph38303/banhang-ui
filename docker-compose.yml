@@ -1,41 +1,21 @@
-
-
+version: "3"
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    restart: always
+  app:
+    build: .
+    ports:
+      - "8089:3000"
+    volumes:
+      - .:/app
     environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
+      - DB_HOST=host.docker.internal
+      - DB_USER=root
+      - DB_PASS=
+      - DB_NAME=banhang
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
       MYSQL_DATABASE: banhang
     ports:
       - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-  api:
-    build: .
-    container_name: api
-    restart: always
-    ports:
-      - "8089:3000"
-    environment:
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: yourpassword
-      DB_NAME: banhang
-
-      SESSION_SECRET: "supersecretkey123"
-      SECRET_KEY: "jwt_secret_key_456"
-
-    depends_on:
-      mysql:
-        condition: service_healthy
-
-volumes:
-  mysql_data:

@@ -65,38 +65,26 @@
         });
         async function login() {
             const result = document.getElementById("result");
-            const username = document.getElementById("loginUser").value;
+            const email = document.getElementById("loginUser").value;
             const password = document.getElementById("loginPass").value;
-            try {
-                const res = await fetch("http://localhost:3000/login", { // đảm bảo đúng port
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        username,
-                        password
-                    }),
-                    credentials: "include",
-                });
 
-                if (!res.ok) {
-                    const error = await res.json().catch(() => ({}));
-                    result.innerText = error.message || "Đăng nhập thất bại!";
-                    return;
-                }
+            const res = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            });
 
-                const data = await res.json();
-                result.innerText = data.message || "";
+            const data = await res.json();
+            result.innerText = data.message || "";
 
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("role", data.role);
-                    window.location.href = "/";
-                }
-            } catch (err) {
-                console.error(err);
-                result.innerText = "Có lỗi xảy ra, thử lại sau!";
+            if (data.status === "success") {
+                window.location.href = "/";
             }
         }
     </script>
